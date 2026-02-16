@@ -31,6 +31,11 @@ uv run python fill_categories.py
 uv run python seeding.py
 ```
 
+### Step 3: Link Categories to Options
+```bash
+uv run python link_category_options.py
+```
+
 ## That's it! 🎉
 
-Both scripts will output progress messages and confirm when complete.
+All scripts will output progress messages and confirm when complete.

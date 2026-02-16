@@ -66,6 +66,15 @@ Generates product variant options using AI for the top 10 active categories.
 - Uses OpenAI to generate realistic product variant options for each category
 - Creates options and option values in `ecom_options` and `ecom_option_values` tables
 
+### 3. `link_category_options.py`
+Links categories to their suggested product variant options in the `ecom_category_option_suggestions` table.
+
+**What it does:**
+- Fetches top 10 active categories and all available options
+- Uses AI to determine which options are relevant for each category
+- Creates links in `ecom_category_option_suggestions` table (category_id, option_id pairs)
+- Skips duplicate links if they already exist
+
 ## Running the Scripts
 
 ### Step 1: Populate Categories
@@ -115,6 +124,37 @@ python seeding.py
 🎉 AI-based variant generation completed
 ```
 
+### Step 3: Link Categories to Options
+
+After options are generated, link categories to their suggested options:
+
+```bash
+# Using uv
+uv run python link_category_options.py
+
+# Or using python directly
+python link_category_options.py
+```
+
+**Expected Output:**
+```
+📋 Fetching categories...
+✅ Found 10 categories
+📋 Fetching available options...
+✅ Found XX options
+
+🔗 Processing category: Clothing & Accessories
+   💡 AI suggested 5 options
+   ✅ Linked to option: size
+   ✅ Linked to option: color
+   ...
+   📊 Created 5 new links for this category
+
+🎉 Category-option linking completed!
+   ✅ Created XX new links
+   ⏭️  Skipped X existing links
+```
+
 ## Troubleshooting
 
 ### Database Connection Errors
@@ -150,11 +190,14 @@ The scripts expect the following tables:
 - `ecom_categories` - Stores category hierarchy
 - `ecom_options` - Stores product variant options (e.g., Size, Color)
 - `ecom_option_values` - Stores values for each option (e.g., Small, Medium, Large)
+- `ecom_category_option_suggestions` - Links categories to their suggested options (category_id, option_id)
 
 ## Notes
 
-- The `seeding.py` script processes only the **top 10 categories** (LIMIT 10)
+- The `seeding.py` and `link_category_options.py` scripts process only the **top 10 categories** (LIMIT 10)
 - Categories must have `is_active = true` to be processed
 - The AI generates realistic variant options based on category name and description
+- `link_category_options.py` requires options to exist first (run `seeding.py` before it)
 - All operations are transactional - if an error occurs, changes are rolled back
+- Duplicate category-option links are automatically skipped
 
