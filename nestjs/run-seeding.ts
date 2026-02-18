@@ -165,9 +165,24 @@ export class EcomSeedingService {
 
   async fillCategories(jsonFilePath?: string): Promise<{ success: boolean; count: number; message: string }> {
     try {
-      // If no path provided, look in parent directory (one level up from nestjs folder)
-      const defaultPath = jsonFilePath || path.join(process.cwd(), '..', 'amazon_browse_nodes_complete (1).json');
-      const filePath = path.resolve(defaultPath);
+      // If no path provided, look in current directory first, then parent directory
+      let filePath: string;
+      if (jsonFilePath) {
+        filePath = path.resolve(jsonFilePath);
+      } else {
+        // Try current directory first (nestjs folder)
+        const currentDirPath = path.join(process.cwd(), 'amazon_browse_nodes_complete (1).json');
+        // Try parent directory as fallback
+        const parentDirPath = path.join(process.cwd(), '..', 'amazon_browse_nodes_complete (1).json');
+        
+        if (fs.existsSync(currentDirPath)) {
+          filePath = path.resolve(currentDirPath);
+        } else if (fs.existsSync(parentDirPath)) {
+          filePath = path.resolve(parentDirPath);
+        } else {
+          filePath = path.resolve(currentDirPath); // Will throw error with helpful message
+        }
+      }
       
       this.logger.log(`📖 Reading categories from ${filePath}...`);
 
@@ -590,10 +605,10 @@ async function bootstrap() {
 
     // Get limit from environment or use default
     const limit = parseInt(process.env.CATEGORY_LIMIT || '10', 10);
-    // JSON file path - if not provided, look in parent directory (one level up from nestjs folder)
+    // JSON file path - if not provided, will be auto-detected in fillCategories
     const jsonFilePath = process.env.JSON_FILE_PATH 
       ? path.resolve(process.env.JSON_FILE_PATH)
-      : undefined; // Will use default path in fillCategories method
+      : undefined; // Will auto-detect in fillCategories method
 
     // Step 1: Fill Categories
     logger.log('\n📦 STEP 1: Filling Categories from JSON');
