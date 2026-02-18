@@ -1,0 +1,38 @@
+{
+  "name": "ecom-data-seeding",
+  "version": "1.0.0",
+  "description": "E-commerce data seeding scripts for categories, options, and links",
+  "main": "run-seeding.ts",
+  "scripts": {
+    "start": "ts-node run-seeding.ts",
+    "build": "tsc",
+    "start:prod": "node run-seeding.js"
+  },
+  "keywords": [
+    "ecommerce",
+    "seeding",
+    "nestjs",
+    "postgresql"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@nestjs/common": "^10.0.0",
+    "@nestjs/core": "^10.0.0",
+    "@nestjs/config": "^3.0.0",
+    "pg": "^8.11.0",
+    "openai": "^4.0.0",
+    "uuid": "^9.0.0",
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "^7.8.0"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^10.0.0",
+    "@types/node": "^20.0.0",
+    "@types/pg": "^8.10.0",
+    "@types/uuid": "^9.0.0",
+    "typescript": "^5.0.0",
+    "ts-node": "^10.9.0"
+  }
+}
+
