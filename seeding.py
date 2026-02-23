@@ -30,20 +30,27 @@ def get_connection():
     return psycopg2.connect(**DB_CONFIG)
 
 
-def get_categories(conn, limit=10):
+def get_categories(conn, limit=None):
     """Get active categories from the database.
     
     Args:
         conn: Database connection
-        limit: Number of categories to fetch (default: 10)
+        limit: Number of categories to fetch (None = all categories)
     """
     with conn.cursor() as cur:
-        cur.execute("""
-            SELECT id, name, description
-            FROM ecom_categories
-            WHERE is_active = true
-            LIMIT %s
-        """, (limit,))
+        if limit:
+            cur.execute("""
+                SELECT id, name, description
+                FROM ecom_categories
+                WHERE is_active = true
+                LIMIT %s
+            """, (limit,))
+        else:
+            cur.execute("""
+                SELECT id, name, description
+                FROM ecom_categories
+                WHERE is_active = true
+            """)
         return cur.fetchall()
 
 
@@ -144,16 +151,20 @@ def insert_option_values(conn, option_id, values):
             ))
 
 
-def process_categories(limit=10):
+def process_categories(limit=None):
     """Process categories and generate variant options.
     
     Args:
-        limit: Number of categories to process (default: 10)
+        limit: Number of categories to process (None = all categories)
     """
     conn = get_connection()
     try:
-        # Get limit from environment variable or use default
-        category_limit = int(os.getenv("CATEGORY_LIMIT", limit))
+        # Get limit from environment variable if set, otherwise process all
+        category_limit = None
+        if os.getenv("CATEGORY_LIMIT"):
+            category_limit = int(os.getenv("CATEGORY_LIMIT"))
+        elif limit:
+            category_limit = limit
         categories = get_categories(conn, limit=category_limit)
 
         for category_id, name, description in categories:
